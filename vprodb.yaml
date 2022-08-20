@@ -17,6 +17,8 @@ spec:
       containers:
       - name: vprodb
         image: vprofile/vprofiledb:V1
+        args:
+         - "--ignore-db-dir=lost+found"
         ports:
         - name: db-port
           containerPort: 3306
@@ -26,9 +28,9 @@ spec:
         env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
-          secretKeyRef:
-            name: app-secret 
-            key: db-pass
+            secretKeyRef:
+              name: app-secret 
+              key: db-pass
 
       nodeSelector:
         zone: us-east-2b

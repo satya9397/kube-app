@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vprodb-deployment
+  labels:
+    app: db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-deployment
+  template:
+    metadata:
+      labels:
+        app: db-deployment
+    spec:
+      containers:
+      - name: vprodb
+        image: vprofile/vprofiledb:V1
+        ports:
+        - name: db-port
+          containerPort: 3306
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: ebs-volume
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+          secretKeyRef:
+            name: app-secret 
+            key: db-pass
+
+      nodeSelector:
+        zone: us-east-2b
+      volumes:
+        - name: ebs-volume
+      # This AWS EBS volume must already exist.
+          awsElasticBlockStore:
+            volumeID: "vol-0d6c5b38ecb3f9683"
+            fsType: ext4

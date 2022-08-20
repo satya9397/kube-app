@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbit-deployment
+  labels:
+    app: rabb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabb-deployment
+  template:
+    metadata:
+      labels:
+        app: rabb-deployment
+    spec:
+      containers:
+      - name: vpromq01
+        image: rabbitmq
+        ports:
+        - name: rabb-port
+          containerPort: 15672
+        env:
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+          secretKeyRef:
+            name: app-secret 
+            key: rmq-pass
+        - name: RABBITMQ_DEFAULT_USER
+          value: "guest"
+
+      nodeSelector:
+        zone: us-east-2b
+      volumes:
+        - name: ebs-volume
+      # This AWS EBS volume must already exist.
+          awsElasticBlockStore:
+            volumeID: "vol-0d6c5b38ecb3f9683"
+            fsType: ext4
